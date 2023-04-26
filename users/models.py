@@ -40,9 +40,10 @@ class User(AbstractBaseUser):
     GENDER_CHOICES=(
         ('W','여성'),
         ('M','남성'),
+        ('H','무성'),
     )
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
-    age = models.CharField(max_length=50, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, default='H')
+    age = models.PositiveIntegerField(blank=True)
     introduction = models.TextField(max_length=256, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
