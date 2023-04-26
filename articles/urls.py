@@ -1,8 +1,8 @@
-from django.contrib import admin
-from django.urls import path,include
+from django.urls import path
+from articles import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    # path('users/', include("users.urls")),
-    # path('articles/', include("articles.urls")),
+    path('', views.TodoView.as_view(), name='todo_view'),
+    path('<int:todo_id>/', views.TodoDetailView.as_view(), name='todo_detail_view'),
+    path('board/', views.TodoListView_BoardView.as_view(), name='board_view'),
 ]
