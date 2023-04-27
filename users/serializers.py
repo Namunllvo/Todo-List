@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from users.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from articles.serializers import TodoListSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,27 +10,30 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = super().create(validated_data)
-        print(validated_data)
+        # print(validated_data)
         password = user.password
-        print(user.password)
+        # print(user.password)
         user.set_password(password)     # pw hashing 암호화
         # print(user.password)
         user.save()
         return user
-    
 
-    
     # instance : 수정할 object
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.introduction = validated_data.get('introduction', instance.introduction)
+        instance.age = validated_data.get('age', instance.age)
+        instance.save()
+        return instance
 
-    def update(self, validated_data):
-        user = super().create(validated_data)
-        user.username = validated_data.get('username', user.username)
-        user.introduction = validated_data.get('introduction', user.introduction)
-        user.age = validated_data.get('age', user.age)
-        password = user.password
-        user.set_password(password)
-        user.save()
-        return user
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    todo_set = TodoListSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = "__all__" # 원래 있던필드 + 추가한 필드
+
 
 
     # payload 커스텀 - user_id(기본)에 email추가
