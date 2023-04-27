@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -7,8 +8,6 @@ from articles.serializers import TodoSerializer, TodoCreateSerializer, TodoListS
 
 # Create your views here.
 class TodoView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
     def get(self, request):
         # TodoListSerializer
         todo = Todo.objects.all()
@@ -24,18 +23,35 @@ class TodoView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class TodoDetailView(APIView):
-    def get():
+    def get(self, request, todo_id):
         # TodoSerializer?
-        pass
-    def put():
+        todo = get_object_or_404(Todo, id=todo_id)
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, todo_id):
         # TodoSerializer
-        # update
-        pass
-    def delete():
+        todo = get_object_or_404(Todo, id=todo_id)
+        if request.user == todo.user:
+            serializer = TodoCreateSerializer(todo, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("권한이 없는 유저입니다!", status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request, todo_id):
         # Todo
-        # delete
-        pass
+        todo = get_object_or_404(Todo, id=todo_id)
+        if request.user == todo.user:
+            todo.delete()
+            return Response("삭제되었습니다", status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response("권한이 없는 유저입니다!", status=status.HTTP_403_FORBIDDEN)
 
 class TodoListView_BoardView(APIView):
     # 이곳은 모든 트렐로처럼 유저가 등록한 할일목록 중 공개로 돌린 할일만 보이게 하는 view
