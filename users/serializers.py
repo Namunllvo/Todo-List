@@ -17,6 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
     
+
+    
+    # instance : 수정할 object
+
     def update(self, validated_data):
         user = super().create(validated_data)
         user.username = validated_data.get('username', user.username)
